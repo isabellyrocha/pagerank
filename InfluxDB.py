@@ -26,6 +26,7 @@ class InfluxDB:
 
     def create_database(self):
         self.influx_client.create_database("pagerank")
+        
     def drop_database(self):
         self.influx_client.drop_database("pagerank")
 
@@ -34,7 +35,6 @@ class InfluxDB:
                 'FROM pagerank."autogen"."rankings" ' \
                 'WHERE page =~ /%s/ AND iteration =~ /%d/;' % (page, iteration)
         result = list(self.influx_client.query(query))
-        if result:
-            return result[0][0]['rank']
-        else:
-            return None
+        while result == None:
+            result = list(self.influx_client.query(query))    
+        return result[0][0]['rank']
