@@ -1,6 +1,6 @@
 from influxdb import InfluxDBClient
 
-class InfluxDB():
+class InfluxDB:
     def __init__(self, args):
         self.influx_client = InfluxDBClient(args.influx_host, 
                                             args.influx_port, 
@@ -12,7 +12,7 @@ class InfluxDB():
     def write_rank(self, page: str, iteration: int, rank: float):
         json_body = [
         {
-            "measurement: rankings",
+            "measurement": "rankings",
             "tags": {
                 "page": page,
             },

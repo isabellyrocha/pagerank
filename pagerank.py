@@ -2,6 +2,7 @@ from __future__ import division
 from argparse import ArgumentParser
 from page import Page
 from Dummy import InfluxTest
+from InfluxDB import InfluxDB
 import traceback
 
 class PageRank:
