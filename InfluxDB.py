@@ -15,8 +15,8 @@ class InfluxDB:
             "measurement": "rankings",
             "tags": {
                 "page": page,
+                "iteration": iteration,
             },
-            "iteraion": iteration,
             "fields": {
                 "rank": rank
             }
@@ -24,10 +24,15 @@ class InfluxDB:
         ]
         self.influx_client.write_points(json_body)
 
+    def create_database(self):
+        self.influx_client.create_database("pagerank")
+    def drop_database(self):
+        self.influx_client.drop_database("pagerank")
+
     def get_rank(self, page: str, iteration: int) -> dict:
         query = 'SELECT rank ' \
-                'FROM pagerank."default"."%s" ' \
-                'WHERE page =~ /%s/ AND iteration =~ /%s/;' % (page, iteration)
+                'FROM pagerank."autogen"."rankings" ' \
+                'WHERE page =~ /%s/ AND iteration =~ /%d/;' % (page, iteration)
         result = list(self.influx_client.query(query))
         if result:
             return result[0][0]['rank']

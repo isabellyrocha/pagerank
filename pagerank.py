@@ -40,6 +40,7 @@ class PageRank:
         self.metrics_storage.write_rank(page, iteration, next_rank)
         
     def run(self):
+        self.metrics_storage.create_database()
         pages = self.pages.keys()
         initial_rank = 1/len(pages)
         
@@ -53,6 +54,7 @@ class PageRank:
             except Exception:
                 traceback.print_exc()
                 pass
+        self.metrics_storage.drop_database()
     
 def main():
     parser = ArgumentParser(description='rank page')
