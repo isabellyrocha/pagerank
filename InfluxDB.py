@@ -9,7 +9,7 @@ class InfluxDB:
                                             args.influx_database)
     
     
-    def write_rank(self, page: str, iteration: int, rank: float):
+    def write_rank(self, page, iteration, rank):
         json_body = [
         {
             "measurement": "rankings",
@@ -30,11 +30,11 @@ class InfluxDB:
     def drop_database(self):
         self.influx_client.drop_database("pagerank")
 
-    def get_rank(self, page: str, iteration: int) -> dict:
+    def get_rank(self, page, iteration):
         query = 'SELECT rank ' \
                 'FROM pagerank."autogen"."rankings" ' \
                 'WHERE page =~ /%s/ AND iteration =~ /%d/;' % (page, iteration)
         result = list(self.influx_client.query(query))
-        while result == None:
+        while not result:
             result = list(self.influx_client.query(query))    
         return result[0][0]['rank']

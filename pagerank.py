@@ -31,7 +31,7 @@ class PageRank:
                         in_connection.add_out_connection(page)
                 
     
-    def compute_next_rank(self, page: int, iteration: int):
+    def compute_next_rank(self, page, iteration):
         next_rank = 0
         for connection in self.pages[page].get_in_connections():
             connection_rank = self.metrics_storage.get_rank(int(connection.get_name()), iteration-1)
@@ -54,7 +54,7 @@ class PageRank:
             except Exception:
                 traceback.print_exc()
                 pass
-        self.metrics_storage.drop_database()
+        #self.metrics_storage.drop_database()
     
 def main():
     parser = ArgumentParser(description='rank page')

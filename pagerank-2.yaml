@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pagerank-2
+spec:
+  template:
+    spec:
+      containers:
+      - name: pagerank-2
+        image: isabellyrocha/pagerank:latest
+        command: ["python", "/usr/local/bin/pagerank.py", "--pages-file-name=/usr/local/bin/pagerank.input", "--iterations=5", "--start=3", "--end=4", "--influx-host=10.96.21.32", "--influx-port=8086", "--influx-database=pagerank"]
+      restartPolicy: Never
+  backoffLimit: 1
