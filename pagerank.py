@@ -64,6 +64,19 @@ def main():
                         help='int corresponding to the name of page the program should start')
     parser.add_argument('--end', nargs='?', const='page-rank', metavar=0, type=int,
                         help='int corresponding to the name of page the program should end')
+    parser.add_argument('--influx-user', nargs='?', const='root', metavar='influx-user', type=str,
+                        help='string corresponding to the user name of the influx database')
+    parser.add_argument('--influx-pass', nargs='?', const='root', metavar='influx-pass', type=str,
+                        help='string corresponding to the password of the influx database')
+    parser.add_argument('--influx-host', metavar='influx-host', type=str,
+                        help='string corresponding to the host address of the influx database')
+    parser.add_argument('--influx-port', metavar='influx-port', type=int,
+                        help='int corresponding to the port of the influx database')
+    parser.add_argument('--influx-database', nargs='?', const='k8s', metavar='influx-database', type=str,
+                        help='string corresponding to the name of the influx database')
+    parser.add_argument('-D', nargs='?', const='DEBUG', metavar='DEBUG', type=str,
+                        help='Flag to decide if we want the debug mode or not')
+
     
     args = parser.parse_args()
     page_rank = PageRank(args)
