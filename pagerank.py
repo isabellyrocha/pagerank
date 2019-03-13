@@ -6,8 +6,8 @@ import traceback
 
 class PageRank:
     def __init__(self, args):
-        #self.metrics_storage = InfluxDB(args)
-        self.metrics_storage = InfluxTest()
+        self.metrics_storage = InfluxDB(args)
+        #self.metrics_storage = InfluxTest()
         self.pages_file_name = args.pages_file_name
         self.iterations = args.iterations
         self.start = args.start
