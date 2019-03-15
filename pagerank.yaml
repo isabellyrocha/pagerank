@@ -7,7 +7,9 @@ spec:
     spec:
       containers:
       - name: pagerank
-        image: isabellyrocha/pagerank:latest
-        command: ["python", "/usr/local/bin/pagerank.py", "--pages-file-name=/usr/local/bin/pagerank.input", "--iterations=5", "--start=1", "--end=2", "--influx-host=10.96.21.32", "--influx-port=8086", "--influx-database=pagerank"]
+        image: isabellyrocha/pagerank:raspberry-pi
+        command: ["python", "/pagerank/pagerank.py", "--number-of-pages=10000", "--pages-file-name=/pagerank/pagerank.10k", "--iterations=3", "--start=0", "--end=9999", "--influx-host=10.96.21.32", "--influx-port=8086", "--influx-database=pagerank"]
+      nodeSelector:
+        kubernetes.io/hostname: vully-1
       restartPolicy: Never
   backoffLimit: 1

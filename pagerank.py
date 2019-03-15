@@ -9,26 +9,25 @@ class PageRank:
     def __init__(self, args):
         self.metrics_storage = InfluxDB(args)
         #self.metrics_storage = InfluxTest()
+        self.number_of_pages = args.number_of_pages
         self.pages_file_name = args.pages_file_name
         self.iterations = args.iterations
         self.start = args.start
         self.end = args.end
         self.pages = {}
-        page_index = 0
+        for page in range(self.number_of_pages):
+            self.pages[page] = Page(page)
+
         with open(self.pages_file_name) as pages_file:
             for line in pages_file:
-                if not self.pages:
-                    line_array = line.split(" ")
-                    for page_name in line_array:
-                        self.pages[int(page_name)] = Page(page_name)
-                else:
-                    line_array = line.split(" ")
-                    page = self.pages[int(line_array[0])]
-                    inConnections = line_array[0:]
-                    for page_name in inConnections:
-                        in_connection = self.pages[int(page_name)]
-                        page.add_in_connection(in_connection)
-                        in_connection.add_out_connection(page)
+                line_array = line.split(" ")
+                print(line)
+                page = self.pages[int(line_array[0])]
+                inConnections = line_array[0:]
+                for page_name in inConnections:
+                    in_connection = self.pages[int(page_name)]
+                    page.add_in_connection(in_connection)
+                    in_connection.add_out_connection(page)
                 
     
     def compute_next_rank(self, page, iteration):
@@ -58,6 +57,8 @@ class PageRank:
     
 def main():
     parser = ArgumentParser(description='rank page')
+    parser.add_argument('--number-of-pages', nargs='?', const='number-of-pages', metavar='number-of-pages', type=int,
+                        help='integer corresponding to the number of pages in the input')
     parser.add_argument('--pages-file-name', nargs='?', const='page-rank', metavar='pagerank-input', type=str,
                         help='string corresponding to the name of file to be used as input')
     parser.add_argument('--iterations', nargs='?', const='page-rank', metavar=3, type=int,
