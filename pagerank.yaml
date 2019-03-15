@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: pagerank
+  name: pagerank-1-2
 spec:
   template:
     spec:
       containers:
-      - name: pagerank
+      - name: pagerank-1-2
         image: isabellyrocha/pagerank:raspberry-pi
-        command: ["python", "/pagerank/pagerank.py", "--number-of-pages=10000", "--pages-file-name=/pagerank/pagerank.10k", "--iterations=3", "--start=0", "--end=9999", "--influx-host=10.96.21.32", "--influx-port=8086", "--influx-database=pagerank"]
+        command: ["python", "/usr/local/bin/pagerank.py", "--number-of-pages=10000", "--pages-file-name=/usr/local/bin/pagerank.10k", "--iterations=3", "--start=0", "--end=4999", "--influx-host=10.96.21.32", "--influx-port=8086", "--influx-database=pagerank"]
       nodeSelector:
         kubernetes.io/hostname: vully-1
       restartPolicy: Never
