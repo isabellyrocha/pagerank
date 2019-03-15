@@ -38,3 +38,14 @@ class InfluxDB:
         while not result:
             result = list(self.influx_client.query(query))    
         return result[0][0]['rank']
+
+    def get_power_node(self, node_name, begin, end):
+        query = 'SELECT value ' \
+                'FROM k8s."default"."power/node_utilization" ' \
+                'WHERE nodename =~ /%s/ AND time >= /%d/ AND time <= /%d/' \
+                'GROUP BY time(1s) FILL(previous);'  % (node_name, begin, end)
+        result = list(self.influx_client.query(query))
+        if result:
+            envelopes[env_type] = result[0][0]['max']
+        else:
+            return None
