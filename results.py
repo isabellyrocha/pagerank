@@ -33,7 +33,14 @@ def query_last(query, influx_client):
     return result
 
 def energy(power_map):
-    return np.trapz(power_map.values(), power_map.keys())
+    values = power_map.values()
+    v = []
+    for value in values:
+        #print(value)
+        new_value = value 
+        v.append(new_value)
+    return np.trapz(v, power_map.keys())
+    #return np.trapz(power_map.values(), power_map.keys())
                                                                
 def main():
     parser = ArgumentParser(description='rank page')

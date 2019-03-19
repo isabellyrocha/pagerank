@@ -17,19 +17,20 @@ class PageRank:
         self.pages = {}
         for page in range(self.number_of_pages):
             self.pages[page] = Page(page)
-
+        connections = 0
         with open(self.pages_file_name) as pages_file:
             for line in pages_file:
                 line_array = line.split(" ")
-                print(line)
+                #print(line)
                 page = self.pages[int(line_array[0])]
                 inConnections = line_array[0:]
                 for page_name in inConnections:
                     in_connection = self.pages[int(page_name)]
                     page.add_in_connection(in_connection)
                     in_connection.add_out_connection(page)
-                
-    
+                connections = connections + len(inConnections)
+        print(connections)
+
     def compute_next_rank(self, page, iteration):
         next_rank = 0
         for connection in self.pages[page].get_in_connections():
