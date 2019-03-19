@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
+from k8s import Kubernetes 
 
 def query_last(query, influx_client):
     req = list(influx_client.query(query))
@@ -59,15 +60,17 @@ def main():
     print("duration:{}\n".format(len(power)))
     print("energy:{}\n".format(total_energy))
     
-    
-    pods = api_k8s.list_pod_for_all_namespaces(
-            field_selector=("metadata.name=pagerank-1-mp5bg")).items
-    print(pods[0].status.container_statuses[0].state.terminated)
-    print(pods[0].status.container_statuses[0].state.terminated.started_at)
-    print(pods[0].status.container_statuses[0].state.terminated.finished_at.strftime("%s"))
-    time=pods[0].status.container_statuses[0].state.terminated.finished_at
+    kube = Kubernetes()
+    print(kube.get_host_node(kube.list_finished_pods()[0]))
+    #print(kube.get_start_time("pagerank-1-mp5bg"))
+    #pods = api_k8s.list_pod_for_all_namespaces(
+    #        field_selector=("metadata.name=pagerank-1-mp5bg")).items
+    #print(pods[0].status.container_statuses[0].state.terminated)
+    #print(pods[0].status.container_statuses[0].state.terminated.started_at)
+    #print(pods[0].status.container_statuses[0].state.terminated.finished_at.strftime("%s"))
+    #time=pods[0].status.container_statuses[0].state.terminated.finished_at
     #timestamp = datetime.timestamp(time)
-    print("timestamp =", timedelta(days=365))
+    #print("timestamp =", timedelta(days=365))
     #print("Found %d scheduled pods" % len(pods))
 
 if __name__ == '__main__':

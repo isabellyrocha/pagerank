@@ -3,18 +3,32 @@ from kubernetes.client import V1PodStatus, V1ObjectReference, V1Event, V1EventSo
 from kubernetes.client.rest import ApiException
 
 class Kubernetes:
-    def __init__(self, args):
+    def __init__(self):
         config.load_kube_config()
         self.api_k8s = client.CoreV1Api()
 
 
     def get_start_time(self, pod_name):
-        pod = api_k8s.list_pod_for_all_namespaces(
-            field_selector=("metadata.name=%s", pod_name)).items[0]
+        pod = self.api_k8s.list_pod_for_all_namespaces(field_selector=("metadata.name=%s" % (pod_name))).items[0]
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
 
     def get_finished_time(self, pod_name):
-        pod = api_k8s.list_pod_for_all_namespaces(
+        pod = self.api_k8s.list_pod_for_all_namespaces(
             field_selector=("metadata.name=%s", pod_name)).items[0]
         return pod.status.container_statuses[0].state.terminated.finished_at.strftime("%s")
 
+    def list_finished_pods(self):
+        pods = self.api_k8s.list_pod_for_all_namespaces(
+            field_selector=("status.phase=Succeeded")).items
+        #print(pods)
+        #print("Found %d active pods scheduled in node %s" % (len(pods), node))
+        return pods
+
+    def get_started_at(self, pod):
+        return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
+
+    def get_pod_finished_at(self, pod):
+        return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
+
+    def get_host_node(self, pod):
+        return pod.spec.node_name
