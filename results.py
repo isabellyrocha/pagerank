@@ -1,5 +1,6 @@
 from influxdb import InfluxDBClient
 from datetime import datetime
+from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
 from kubernetes import client,config
@@ -65,7 +66,12 @@ def main():
     api_k8s = client.CoreV1Api()
     pods = api_k8s.list_pod_for_all_namespaces(
             field_selector=("metadata.name=pagerank-1-mp5bg")).items
-    #print(pods)
+    print(pods[0].status.container_statuses[0].state.terminated)
+    print(pods[0].status.container_statuses[0].state.terminated.started_at)
+    print(pods[0].status.container_statuses[0].state.terminated.finished_at.strftime("%s"))
+    time=pods[0].status.container_statuses[0].state.terminated.finished_at
+    #timestamp = datetime.timestamp(time)
+    print("timestamp =", timedelta(days=365))
     #print("Found %d scheduled pods" % len(pods))
 
 if __name__ == '__main__':
