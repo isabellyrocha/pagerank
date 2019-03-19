@@ -7,29 +7,37 @@ import traceback
 
 class PageRank:
     def __init__(self, args):
-        self.metrics_storage = InfluxDB(args)
-        #self.metrics_storage = InfluxTest()
+        #self.metrics_storage = InfluxDB(args)
+        self.metrics_storage = InfluxTest()
         self.number_of_pages = args.number_of_pages
         self.pages_file_name = args.pages_file_name
         self.iterations = args.iterations
         self.start = args.start
         self.end = args.end
         self.pages = {}
-        for page in range(self.number_of_pages):
-            self.pages[page] = Page(page)
-        connections = 0
+        #for page in range(self.number_of_pages):
+        #    self.pages[page] = Page(page)
+        print("Reading input graph...")
+        current_page = None
         with open(self.pages_file_name) as pages_file:
             for line in pages_file:
-                line_array = line.split(" ")
-                #print(line)
-                page = self.pages[int(line_array[0])]
-                inConnections = line_array[0:]
-                for page_name in inConnections:
-                    in_connection = self.pages[int(page_name)]
-                    page.add_in_connection(in_connection)
-                    in_connection.add_out_connection(page)
-                connections = connections + len(inConnections)
-        print(connections)
+                print(line)
+                if (not line.startswith('#')):
+                    line_array = line.split('\t')
+                    fromNodeId = line_array[0]
+                    toNodeId = line_array[1].rstrip()
+                    if (fromNodeId != current_page):
+                        fromPage = self.get_page(line_array[0])
+                        current_page = fromNodeId
+                    toPage = self.get_page(line_array[1].rstrip())
+                    toPage.add_in_connection(fromPage)
+                    fromPage.add_out_connection()
+        print("Done with input")
+        
+    def get_page(self, page_name):
+        if (int(page_name) not in self.pages.keys()):
+            self.pages[int(page_name)] = Page(page_name)
+        return self.pages[int(page_name)]
 
     def compute_next_rank(self, page, iteration):
         next_rank = 0
@@ -38,7 +46,7 @@ class PageRank:
             number_of_out_connections = connection.get_out_connections()
             next_rank += connection_rank/number_of_out_connections
         self.metrics_storage.write_rank(page, iteration, next_rank)
-        
+    
     def run(self):
         self.metrics_storage.create_database()
         pages = self.pages.keys()
