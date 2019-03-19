@@ -27,7 +27,7 @@ class Kubernetes:
     def get_started_at(self, pod):
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
 
-    def get_pod_finished_at(self, pod):
+    def get_finished_at(self, pod):
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
 
     def get_host_node(self, pod):

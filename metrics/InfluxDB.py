@@ -30,7 +30,7 @@ class InfluxDB:
     def drop_database(self):
         self.influx_client.drop_database("pagerank")
 
-    def å(self, page, iteration):
+    def get_rank(self, page, iteration):
         query = 'SELECT rank ' \
                 'FROM pagerank."autogen"."rankings" ' \
                 'WHERE page =~ /%s/ AND iteration =~ /%d/;' % (page, iteration)
@@ -40,9 +40,9 @@ class InfluxDB:
         return result[0][0]['rank']
 
     def get_power_node(self, node_name, begin, end):
-        query = 'SELECT max(value) ' \
+        query = 'SELECT value ' \
                 'FROM k8s."default"."power/node_utilization" ' \
                 'WHERE "nodename" = \'%s\' and ' \
-                'time >= %s and time <= %s ' \
-                'GROUP BY time(1s) FILL(linear)' % (node_name, begin, end)
+                'time >= %d and time <= %d ' % (node_name, begin, end)
+        print(query)
         return list(self.influx_client.query(query))
