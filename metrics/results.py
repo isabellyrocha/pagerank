@@ -43,35 +43,22 @@ def energy(power_map):
                                                                
 def main():
     parser = ArgumentParser(description='rank page')
-    parser.add_argument('--started', nargs='?', const='started', metavar='number-of-pages', type=int,
-                        help='integer corresponding to the number of pages in the input')
-    parser.add_argument('--finished', nargs='?', const='finished', metavar='number-of-pages', type=int,
-                        help='integer corresponding to the number of pages in the input')
-    influx_client = InfluxDBClient("10.96.21.32", "8086", "root", "root", "k8s")    
-    
-    parser.add_argument('--node-name', nargs='?', const='node-name', metavar='number-of-pages', type=str,
-                        help='integer corresponding to the number of pages in the input')
+    parser.add_argument('--influx-host', metavar='influx-host', type=str,
+                        help='string corresponding to the host address of the influx database')
+    parser.add_argument('--influx-port', metavar='influx-port', type=int,
+                        help='int corresponding to the port of the influx database')
+   
     args = parser.parse_args()
-    started = int(args.started)*1000000000
-    finished = int(args.finished)*1000000000
-    power = query_last('SELECT max(value) FROM k8s."default"."power/node_utilization" WHERE "nodename" = \'%s\' and '
-                                       'time >= %s and time <= %s group by time(1s) fill(linear)' % (args.node_name,started,finished), influx_client)
-    total_energy = energy(power)
-    print("duration:{}\n".format(len(power)))
-    print("energy:{}\n".format(total_energy))
-    
     kube = Kubernetes()
-    print(kube.get_host_node(kube.list_finished_pods()[0]))
-    #print(kube.get_start_time("pagerank-1-mp5bg"))
-    #pods = api_k8s.list_pod_for_all_namespaces(
-    #        field_selector=("metadata.name=pagerank-1-mp5bg")).items
-    #print(pods[0].status.container_statuses[0].state.terminated)
-    #print(pods[0].status.container_statuses[0].state.terminated.started_at)
-    #print(pods[0].status.container_statuses[0].state.terminated.finished_at.strftime("%s"))
-    #time=pods[0].status.container_statuses[0].state.terminated.finished_at
-    #timestamp = datetime.timestamp(time)
-    #print("timestamp =", timedelta(days=365))
-    #print("Found %d scheduled pods" % len(pods))
+    metrics_storage = InfluxDB(args)
+    
+    finished_pods = kube.list_finished_pods()
+    for pod in finished_pods:
+        started = int(kube.get_stated_at(pod))*1000000000
+        finished = int(kube.get_finished_at(pod))*1000000000
+        host = kube.get_host_node(pod)
+        print(metrics_storage.get_power_node(str(node), started, finished))
+
 
 if __name__ == '__main__':
     main()

@@ -45,8 +45,4 @@ class InfluxDB:
                 'WHERE "nodename" = \'%s\' and ' \
                 'time >= %s and time <= %s ' \
                 'GROUP BY time(1s) FILL(linear)' % (node_name, begin, end)
-        result = list(self.influx_client.query(query))
-        if result:
-            envelopes[env_type] = result[0][0]['max']
-        else:
-            return None
+        return list(self.influx_client.query(query))
