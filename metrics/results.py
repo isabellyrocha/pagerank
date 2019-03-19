@@ -3,9 +3,6 @@ from datetime import datetime
 from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
-from kubernetes import client,config
-from kubernetes.client import V1PodStatus, V1ObjectReference, V1Event, V1EventSource, V1Pod, V1PodSpec, V1Node, V1Binding, V1Container, V1DeleteOptions, V1ObjectMeta, V1ResourceRequirements
-from kubernetes.client.rest import ApiException
 
 def query_last(query, influx_client):
     req = list(influx_client.query(query))
@@ -62,8 +59,7 @@ def main():
     print("duration:{}\n".format(len(power)))
     print("energy:{}\n".format(total_energy))
     
-    config.load_kube_config()
-    api_k8s = client.CoreV1Api()
+    
     pods = api_k8s.list_pod_for_all_namespaces(
             field_selector=("metadata.name=pagerank-1-mp5bg")).items
     print(pods[0].status.container_statuses[0].state.terminated)
