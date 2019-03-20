@@ -53,27 +53,27 @@ class PageRank:
         print(final_rank)
     
     def run(self):
+        print("Creating database pagerank...")
         self.metrics_storage.create_database()
-        
         total_pages = list(self.pages.keys())
         pages_per_node = int(len(total_pages)/self.number_of_nodes)
         node_pages = total_pages[(pages_per_node*self.node_id):(pages_per_node*(self.node_id+1))]
-
+        print("Initial ranking...")
         initial_rank = 1/len(total_pages)
         for page in node_pages:
             self.metrics_storage.write_rank(0, page, initial_rank)
-        print(node_pages)
+        print("Done with inital rankings!")
         for iteration in range(1, self.iterations+1):
-            print("Iteration: "+str(iteration))
+            print("Running iteration "+str(iteration)+"...")
             try:
                 for page in node_pages:
-                    print("Pagge: "+str(page))
                     next_rank = self.compute_next_rank(page, iteration)
                     self.metrics_storage.write_rank(iteration, page, next_rank)
             except Exception:
                 traceback.print_exc()
                 pass
-        #self.metrics_storage.drop_database()
+        print("Done! Deleting database pagerank...")
+        self.metrics_storage.drop_database()
                 
 def main():
     parser = ArgumentParser(description='rank page')
@@ -97,9 +97,10 @@ def main():
                         help='string corresponding to the name of the influx database')
     parser.add_argument('-D', nargs='?', const='DEBUG', metavar='DEBUG', type=str,
                         help='Flag to decide if we want the debug mode or not')
-
     args = parser.parse_args()
+    print("Loading graph of pages...")
     page_rank = PageRank(args)
+    print("Pages graph loaded!")
     page_rank.run()
 
 if __name__ == '__main__':
