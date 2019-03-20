@@ -1,37 +1,9 @@
-from kubernetes.client import V1Pod,V1ObjectMeta,V1PodSpec,V1Container
 from metrics.InfluxDB import InfluxDB
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
-from metrics.k8s import Kubernetes 
-
-def create_pod(pod_name, hostname):
-    return V1Pod(
-            api_version="v1",
-            kind="Pod",
-            metadata=V1ObjectMeta(
-                name=pod_name,
-            ),
-            spec=V1PodSpec(
-                containers=[V1Container(
-                    name=pod_name,
-                    image_pull_policy="IfNotPresent",
-                    image="isabellyrocha/pagerank:raspberry-pi",
-                    command=["python3",
-                            "/pagerank/pagerank.py",
-                            " --pages-file-name=/pagerank/input/web-Stanford-Subet.txt"
-                            "--iterations=3",
-                            "--number-of-nodes=1",
-                            "--node-id=0",
-                            "--influx-host=10.96.21.32",
-                            "--influx-port=8086",
-                            "--influx-database=pagerank"],
-                )],
-                node_selector={'kubernetes.io/hostname':hostname},
-                restart_policy="OnFailure"
-            )
-        ) 
+from metrics.k8s import Kubernetes  
 
 def energy(power_values):
     return np.trapz(power_values)
@@ -52,7 +24,7 @@ def main():
     kube = Kubernetes()
     metrics_storage = InfluxDB(args)
     
-    pod = create_pod('pagerank-api','vully-1')
+    pod = kube.create_pod('pagerank-api', 'vully-1')
     kube.api_k8s.create_namespaced_pod("default", pod)
     
     finished_pods = kube.list_finished_pods()
