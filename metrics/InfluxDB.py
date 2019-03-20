@@ -40,9 +40,9 @@ class InfluxDB:
         return result[0][0]['rank']
 
     def get_power_node(self, node_name, begin, end):
-        query = 'SELECT max(value) ' \
+        query = 'SELECT value ' \
                 'FROM k8s."default"."power/node_utilization" ' \
                 'WHERE "nodename" = \'%s\' and ' \
-                'time >= %s and time <= %s ' \
-                'GROUP BY time(1s) FILL(linear)' % (node_name, begin, end)
+                'time >= %d and time <= %d ' % (node_name, begin, end)
+        print(query)
         return list(self.influx_client.query(query))
