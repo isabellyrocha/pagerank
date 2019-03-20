@@ -9,13 +9,13 @@ class InfluxDB:
                                             args.influx_database)
     
     
-    def write_rank(self, page, iteration, rank):
+    def write_rank(self, iteration, page, rank):
         json_body = [
         {
             "measurement": "rankings",
             "tags": {
-                "page": page,
                 "iteration": iteration,
+                "page": page
             },
             "fields": {
                 "rank": rank

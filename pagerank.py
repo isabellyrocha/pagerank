@@ -7,8 +7,8 @@ import traceback
 
 class PageRank:
     def __init__(self, args):
-        #self.metrics_storage = InfluxDB(args)
-        self.metrics_storage = InfluxTest()
+        self.metrics_storage = InfluxDB(args)
+        #self.metrics_storage = InfluxTest()
         self.iterations = args.iterations
         self.number_of_nodes = args.number_of_nodes
         self.node_id = args.node_id
@@ -37,12 +37,12 @@ class PageRank:
         return self.pages[pageId]
 
     def compute_next_rank(self, page, iteration):
-        next_rank = 0
+        next_rank = 0.0
         for connection in self.pages[page].getInConnections():
-            connection_rank = self.metrics_storage.get_rank(int(connection.getID()), iteration-1)
+            connection_rank = self.metrics_storage.get_rank(connection.getID(), iteration-1)
             number_of_out_connections = connection.getOutConnections()
             next_rank += connection_rank/number_of_out_connections
-        self.metrics_storage.write_rank(page, iteration, next_rank)
+        return next_rank
     
     def compute_final_rank(self):
         final_rank = {}
@@ -61,16 +61,19 @@ class PageRank:
 
         initial_rank = 1/len(total_pages)
         for page in node_pages:
-            self.metrics_storage.write_rank(page, 0, initial_rank)
-        
-        for i in range(1, self.iterations+1):
+            self.metrics_storage.write_rank(0, page, initial_rank)
+        print(node_pages)
+        for iteration in range(1, self.iterations+1):
+            print("Iteration: "+str(iteration))
             try:
                 for page in node_pages:
-                    self.compute_next_rank(page, i)
+                    print("Pagge: "+str(page))
+                    next_rank = self.compute_next_rank(page, iteration)
+                    self.metrics_storage.write_rank(iteration, page, next_rank)
             except Exception:
                 traceback.print_exc()
                 pass
-        self.metrics_storage.drop_database()
+        #self.metrics_storage.drop_database()
                 
 def main():
     parser = ArgumentParser(description='rank page')
