@@ -5,6 +5,32 @@ import numpy as np
 from argparse import ArgumentParser
 from metrics.k8s import Kubernetes 
 
+def create_pod(pod_name, host_node):
+    return V1Pod(
+            api_version="v1",
+            kind="Pod",
+            metadata=V1ObjectMeta(
+                name=pode_name,
+            ),
+            spec=V1PodSpec(
+                containers=[V1Container(
+                    name=pod_name,
+                    image_pull_policy="IfNotPresent",
+                    image="isabellyrocha/pagerank:raspberry-pi",
+                    command=["python3",
+                            "/pagerank/pagerank.py",
+                            " --pages-file-name=/pagerank/input/web-Stanford-Subet.txt"
+                            "--iterations=3",
+                            "--number-of-nodes=1",
+                            "--node-id=0",
+                            "--influx-host=10.96.21.32",
+                            "--influx-port=8086",
+                            "--influx-database=pagerank"],
+                ),
+                node_selector= {'kubernetes.io/hostname': hostname}],
+                restart_policy="OnFailure"
+            )
+        ) 
 
 def energy(power_values):
     return np.trapz(power_values)
@@ -24,6 +50,9 @@ def main():
     args = parser.parse_args()
     kube = Kubernetes()
     metrics_storage = InfluxDB(args)
+    
+    pod = create_pod('pagerank-api','vully-1')
+    self.api_k8s.create_namespaced_pod("default", pod)
     
     finished_pods = kube.list_finished_pods()
     for pod in finished_pods:
