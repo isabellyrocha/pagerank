@@ -7,4 +7,11 @@ class InfluxTest():
         self.data[(page, iteration)] = rank
 
     def get_rank(self, page, iteration):
-        return self.data[(page, iteration)]
+        result = self.data[(page, iteration)]
+        return result
+        
+    def create_database(self):
+        self.data = {}
+        
+    def drop_database(self):
+        self.data = {}

@@ -30,7 +30,7 @@ class InfluxDB:
     def drop_database(self):
         self.influx_client.drop_database("pagerank")
 
-    def å(self, page, iteration):
+    def get_rank(self, page, iteration):
         query = 'SELECT rank ' \
                 'FROM pagerank."autogen"."rankings" ' \
                 'WHERE page =~ /%s/ AND iteration =~ /%d/;' % (page, iteration)

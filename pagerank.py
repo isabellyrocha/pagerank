@@ -1,81 +1,87 @@
 from __future__ import division
 from argparse import ArgumentParser
 from page import Page
-from Dummy import InfluxTest
-from InfluxDB import InfluxDB
+from metrics.Dummy import InfluxTest
+from metrics.InfluxDB import InfluxDB
 import traceback
 
 class PageRank:
     def __init__(self, args):
         #self.metrics_storage = InfluxDB(args)
         self.metrics_storage = InfluxTest()
-        self.number_of_pages = args.number_of_pages
-        self.pages_file_name = args.pages_file_name
         self.iterations = args.iterations
-        self.start = args.start
-        self.end = args.end
+        self.number_of_nodes = args.number_of_nodes
+        self.node_id = args.node_id
         self.pages = {}
-        #for page in range(self.number_of_pages):
-        #    self.pages[page] = Page(page)
-        print("Reading input graph...")
-        current_page = None
-        with open(self.pages_file_name) as pages_file:
+
+        self.load_graph(args.pages_file_name)
+        
+    def load_graph(self, pages_file_name):
+        with open(pages_file_name) as pages_file:
             for line in pages_file:
-                print(line)
                 if (not line.startswith('#')):
                     line_array = line.split('\t')
-                    fromNodeId = line_array[0]
-                    toNodeId = line_array[1].rstrip()
-                    if (fromNodeId != current_page):
-                        fromPage = self.get_page(line_array[0])
-                        current_page = fromNodeId
-                    toPage = self.get_page(line_array[1].rstrip())
-                    toPage.add_in_connection(fromPage)
-                    fromPage.add_out_connection()
-        print("Done with input")
-        
-    def get_page(self, page_name):
-        if (int(page_name) not in self.pages.keys()):
-            self.pages[int(page_name)] = Page(page_name)
-        return self.pages[int(page_name)]
+                    
+                    fromNodeId = int(line_array[0])
+                    toNodeId = int(line_array[1].rstrip())
+                    
+                    fromPage = self.get_page(fromNodeId)
+                    toPage = self.get_page(toNodeId)
+                    
+                    toPage.addInConnection(fromPage)
+                    fromPage.addOutConnection()
+                    
+    def get_page(self, pageId):
+        if (pageId not in self.pages.keys()):
+            self.pages[pageId] = Page(pageId)
+        return self.pages[pageId]
 
     def compute_next_rank(self, page, iteration):
         next_rank = 0
-        for connection in self.pages[page].get_in_connections():
-            connection_rank = self.metrics_storage.get_rank(int(connection.get_name()), iteration-1)
-            number_of_out_connections = connection.get_out_connections()
+        for connection in self.pages[page].getInConnections():
+            connection_rank = self.metrics_storage.get_rank(int(connection.getID()), iteration-1)
+            number_of_out_connections = connection.getOutConnections()
             next_rank += connection_rank/number_of_out_connections
         self.metrics_storage.write_rank(page, iteration, next_rank)
     
+    def compute_final_rank(self):
+        final_rank = {}
+        for page in self.pages.values():
+            pageId = page.getID()         
+            rank = self.metrics_storage.get_rank(pageId, self.iterations)
+            final_rank[rank] = pageId
+        print(final_rank)
+    
     def run(self):
         self.metrics_storage.create_database()
-        pages = self.pages.keys()
-        initial_rank = 1/len(pages)
         
-        for page in range(self.start, self.end+1):
+        total_pages = list(self.pages.keys())
+        pages_per_node = int(len(total_pages)/self.number_of_nodes)
+        node_pages = total_pages[(pages_per_node*self.node_id):(pages_per_node*(self.node_id+1))]
+
+        initial_rank = 1/len(total_pages)
+        for page in node_pages:
             self.metrics_storage.write_rank(page, 0, initial_rank)
         
-        for i in range(1, self.iterations):
+        for i in range(1, self.iterations+1):
             try:
-                for page in range(self.start, self.end+1):
+                for page in node_pages:
                     self.compute_next_rank(page, i)
             except Exception:
                 traceback.print_exc()
                 pass
-        #self.metrics_storage.drop_database()
-    
+        self.metrics_storage.drop_database()
+                
 def main():
     parser = ArgumentParser(description='rank page')
-    parser.add_argument('--number-of-pages', nargs='?', const='number-of-pages', metavar='number-of-pages', type=int,
-                        help='integer corresponding to the number of pages in the input')
     parser.add_argument('--pages-file-name', nargs='?', const='page-rank', metavar='pagerank-input', type=str,
                         help='string corresponding to the name of file to be used as input')
     parser.add_argument('--iterations', nargs='?', const='page-rank', metavar=3, type=int,
                         help='integer corresponding to the number of iterations the algorithm should perform')
-    parser.add_argument('--start', nargs='?', const='page-rank', metavar=0, type=int,
-                        help='int corresponding to the name of page the program should start')
-    parser.add_argument('--end', nargs='?', const='page-rank', metavar=0, type=int,
-                        help='int corresponding to the name of page the program should end')
+    parser.add_argument('--number-of-nodes', nargs='?', const='number-of-nodes', metavar=3, type=int,
+                        help='integer corresponding to the number of nodes the algorithm will be running in')
+    parser.add_argument('--node-id', nargs='?', const='page-rank', metavar=3, type=int,
+                        help='integer corresponding to the id of the corresponding node')
     parser.add_argument('--influx-user', nargs='?', const='root', metavar='influx-user', type=str,
                         help='string corresponding to the user name of the influx database')
     parser.add_argument('--influx-pass', nargs='?', const='root', metavar='influx-pass', type=str,
@@ -89,10 +95,8 @@ def main():
     parser.add_argument('-D', nargs='?', const='DEBUG', metavar='DEBUG', type=str,
                         help='Flag to decide if we want the debug mode or not')
 
-    
     args = parser.parse_args()
     page_rank = PageRank(args)
-    
     page_rank.run()
 
 if __name__ == '__main__':
