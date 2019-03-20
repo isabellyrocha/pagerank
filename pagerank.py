@@ -72,8 +72,10 @@ class PageRank:
             except Exception:
                 traceback.print_exc()
                 pass
-        print("Done! Deleting database pagerank...")
-        self.metrics_storage.drop_database()
+        print("Done!")
+        if (self.node_id == 0):
+            print("Deleting database pagerank...")
+            self.metrics_storage.drop_database()
                 
 def main():
     parser = ArgumentParser(description='rank page')

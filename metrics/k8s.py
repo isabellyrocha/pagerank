@@ -25,7 +25,7 @@ class Kubernetes:
         return pods
     
     def get_name(self,pod):
-        return pod.metadata.name
+        return pod.metadata.labels['job-name']
 
     def get_started_at(self, pod):
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
