@@ -23,12 +23,15 @@ class Kubernetes:
         #print(pods)
         #print("Found %d active pods scheduled in node %s" % (len(pods), node))
         return pods
+    
+    def get_name(self,pod):
+        return pod.metadata.name
 
     def get_started_at(self, pod):
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
 
-    def get_pod_finished_at(self, pod):
-        return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
+    def get_finished_at(self, pod):
+        return pod.status.container_statuses[0].state.terminated.finished_at.strftime("%s")
 
     def get_host_node(self, pod):
         return pod.spec.node_name
