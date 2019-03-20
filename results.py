@@ -1,16 +1,17 @@
-from influxdb import InfluxDBClient
+from kubernetes.client import V1Pod,V1ObjectMeta,V1PodSpec,V1Container
+from metrics.InfluxDB import InfluxDB
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
 from metrics.k8s import Kubernetes 
 
-def create_pod(pod_name, host_node):
+def create_pod(pod_name, hostname):
     return V1Pod(
             api_version="v1",
             kind="Pod",
             metadata=V1ObjectMeta(
-                name=pode_name,
+                name=pod_name,
             ),
             spec=V1PodSpec(
                 containers=[V1Container(
@@ -26,8 +27,8 @@ def create_pod(pod_name, host_node):
                             "--influx-host=10.96.21.32",
                             "--influx-port=8086",
                             "--influx-database=pagerank"],
-                ),
-                node_selector= {'kubernetes.io/hostname': hostname}],
+                )],
+                node_selector={'kubernetes.io/hostname':hostname},
                 restart_policy="OnFailure"
             )
         ) 
@@ -52,7 +53,7 @@ def main():
     metrics_storage = InfluxDB(args)
     
     pod = create_pod('pagerank-api','vully-1')
-    self.api_k8s.create_namespaced_pod("default", pod)
+    kube.api_k8s.create_namespaced_pod("default", pod)
     
     finished_pods = kube.list_finished_pods()
     for pod in finished_pods:
@@ -64,7 +65,7 @@ def main():
         pod_energy = energy(power_values)
         pod_duration = (finished - started)/1000000000
         print(pod_name + "," + str(pod_energy) + "," + str(pod_duration))
-pagerank.py
+
 if __name__ == '__main__':
     main()
 
