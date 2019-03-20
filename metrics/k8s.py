@@ -7,7 +7,6 @@ class Kubernetes:
         config.load_kube_config()
         self.api_k8s = client.CoreV1Api()
 
-
     def get_start_time(self, pod_name):
         pod = self.api_k8s.list_pod_for_all_namespaces(field_selector=("metadata.name=%s" % (pod_name))).items[0]
         return pod.status.container_statuses[0].state.terminated.started_at.strftime("%s")
