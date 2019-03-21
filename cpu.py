@@ -26,12 +26,12 @@ def main():
     node = args.node
     metrics_storage = InfluxDB(args)
     
-    cmd = ['ssh', '-oStrictHostKeyChecking=no', '%s.maas' % (node), 'top', '-b', '-d1', '-n1', '|', 'grep', '-i', '"Cpu(s)"', '|', 'head', '-c21', '|', 'cut', '-d', "\' \'", '-f3', '|', 'cut', '-d', "'%'", '-f1']
-    
+    #cmd = ['ssh', '-oStrictHostKeyChecking=no', '%s.maas' % (node), 'top', '-b', '-d1', '-n1', '|', 'grep', '-i', '"Cpu(s)"', '|', 'head', '-c21', '|', 'cut', '-d', "\' \'", '-f3', '|', 'cut', '-d', "'%'", '-f1']
+    cmd = ['ssh', '.maas' % (node), 'sar', '-P', 'ALL', '1', '1', '|', 'grep', '"Average:        all"|cut', '-b', '24,25,26,27,28,29,30']
     while True:
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         result = subprocess.run(cmd, stdout=subprocess.PIPE)
-        cpu = float(result.stdout.decode('utf-8'))
+        cpu = float(result.stdout.decode('utf-8').strip())
         metrics_storage.write_cpu(timestamp, node, cpu)
         time.sleep(1)
 
