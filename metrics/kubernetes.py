@@ -1,6 +1,6 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
-from kubernetes.client import V1Pod
+from kubernetes.client import V1Pod, V1ObjectMeta, V1PodSpec, V1Container
 
 class Kubernetes:
     def __init__(self):
