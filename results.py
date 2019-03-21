@@ -24,7 +24,7 @@ def main():
     k8s = Kubernetes()
     metrics_storage = InfluxDB(args)
     
-    pod = k8s.create_pod('pagerank-api-test', 'vully-1')
+    pod = k8s.create_pagerank_pod('pagerank-api-test', 'vully-1')
     k8s.deploy_pod(pod)
     
     finished_pods = k8s.list_finished_pods()
