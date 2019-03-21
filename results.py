@@ -29,8 +29,8 @@ def main():
     
     finished_pods = k8s.list_finished_pods()
     for pod in finished_pods:
-        started = long(kube.get_started_at(pod))*1000000000
-        finished = long(kube.get_finished_at(pod))*1000000000
+        started = int(kube.get_started_at(pod))*1000000000
+        finished = int(kube.get_finished_at(pod))*1000000000
         host = k8s.get_host_node(pod)
         pod_name = k8s.get_name(pod)
         power_values = metrics_storage.get_power(host, started, finished)
