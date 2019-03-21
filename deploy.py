@@ -12,11 +12,13 @@ def main():
     k8s = Kubernetes() 
     number_of_pods = 10
     for pod_id in range(number_of_pods):
-        pod = k8s.create_pagerank_pod('pagerank-seq-%d' % (pod_id), 'vully-1')
-        k8s.deploy_pod(pod)
+        pod_name = 'pagerank-seq-%d' % (pod_id)
+        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name, 'vully-1'))
         time.sleep(30)
+        pod = k8s.get_pod(pod_name)
         while (not k8s.is_finished(pod)):
             time.sleep(30)
+            pod = k8s.get_pod(pod_name)
 
 if __name__ == '__main__':
     main()
