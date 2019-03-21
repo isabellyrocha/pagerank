@@ -14,7 +14,7 @@ def main():
     for pod_id in range(number_of_pods):
         pod = k8s.create_pagerank_pod('pagerank-seq-%d' % (pod_id), 'vully-1')
         k8s.deploy_pod(pod)
-        while (not k8s.is_finished()):
+        while (not k8s.is_finished(pod)):
             time.sleep(30)
 
 if __name__ == '__main__':
