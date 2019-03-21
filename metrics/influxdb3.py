@@ -39,6 +39,7 @@ class InfluxDB:
             result = list(self.influx_client.query(query))    
         return result[0][0]['rank']
 
+
     def get_power(self, node_name, begin, end):
         query = 'SELECT value ' \
                 'FROM k8s."default"."power/node_utilization" ' \
