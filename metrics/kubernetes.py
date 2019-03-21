@@ -75,4 +75,6 @@ class Kubernetes:
         return pod.spec.node_name
         
     def is_finished(self, pod):
+        print(pod)
+        print(pod.status)
         return pod.status.phase == "Succeeded"
