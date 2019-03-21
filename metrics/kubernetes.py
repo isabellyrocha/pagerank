@@ -10,9 +10,7 @@ class Kubernetes:
     def deploy_pod(self, pod):
         self.api_k8s.create_namespaced_pod("default", pod)
 
-    def create_pagerank_pod(
-        self, pod_name='pagerank', host_name, 
-        number_of_nodes=1, node_id=0):
+    def create_pagerank_pod(self, pod_name='pagerank', host_name, number_of_nodes=1, node_id=0):
         return V1Pod(
             api_version = 'v1',
             kind = 'Pod',
