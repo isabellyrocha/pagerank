@@ -61,7 +61,7 @@ class Kubernetes:
             field_selector=("metadata.name=%s" % (pod_name))).items[0]
         
     def get_name(self, pod):
-        return pod.metadata.labels['job-name']
+        return pod.metadata.name #.labels['job-name']
 
     def get_started_at(self, pod):
         started_at = pod.status.container_statuses[0].state.terminated.started_at
