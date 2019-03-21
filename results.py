@@ -1,9 +1,9 @@
-from metrics.InfluxDB import InfluxDB
+from metrics.influxdb import InfluxDB
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
 from argparse import ArgumentParser
-from metrics.k8s import Kubernetes  
+from metrics.kubernetes import Kubernetes  
 
 def energy(power_values):
     return np.trapz(power_values)
@@ -21,19 +21,19 @@ def main():
     parser.add_argument('--influx-database', nargs='?', const='k8s', metavar='influx-database', type=str,
                         help='string corresponding to the name of the influx database')   
     args = parser.parse_args()
-    kube = Kubernetes()
+    k8s = Kubernetes()
     metrics_storage = InfluxDB(args)
     
-    pod = kube.create_pod('pagerank-api', 'vully-1')
-    kube.api_k8s.create_namespaced_pod("default", pod)
+    pod = k8s.create_pod('pagerank-api-test', 'vully-1')
+    k8s.deploy_pod(pod)
     
-    finished_pods = kube.list_finished_pods()
+    finished_pods = k8s.list_finished_pods()
     for pod in finished_pods:
-        started = int(kube.get_started_at(pod))*1000000000
-        finished = int(kube.get_finished_at(pod))*1000000000
-        host = kube.get_host_node(pod)
-        pod_name = kube.get_name(pod)
-        power_values = metrics_storage.get_power_node(host, started, finished)
+        started = long(kube.get_started_at(pod))*1000000000
+        finished = long(kube.get_finished_at(pod))*1000000000
+        host = k8s.get_host_node(pod)
+        pod_name = k8s.get_name(pod)
+        power_values = metrics_storage.get_power(host, started, finished)
         pod_energy = energy(power_values)
         pod_duration = (finished - started)/1000000000
         print(pod_name + "," + str(pod_energy) + "," + str(pod_duration))
