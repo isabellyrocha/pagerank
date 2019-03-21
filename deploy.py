@@ -11,7 +11,7 @@ from metrics.kubernetes import Kubernetes
 def main():
     k8s = Kubernetes() 
     number_of_pods = 10
-    for pod_id in range(number_of_pods):
+    for pod_id in range(number_of_pods+1,number_of_pods+2):
         pod_name = 'pagerank-seq-%d' % (pod_id)
         k8s.deploy_pod(k8s.create_pagerank_pod(pod_name, 'vully-1'))
         time.sleep(30)
