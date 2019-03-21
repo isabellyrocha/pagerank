@@ -24,6 +24,21 @@ class InfluxDB:
         ]
         self.influx_client.write_points(json_body)
 
+    def write_cpu(self, node, cpu):
+        json_body = [
+        {
+            "measurement": "cpu/node_utilization",
+            "tags": {
+                "iteration": iteration,
+                "page": page
+            },
+            "fields": {
+                "rank": rank
+            }
+        }
+        ]
+        self.influx_client.write_points(json_body)
+
     def create_database(self):
         self.influx_client.create_database("pagerank")
         
