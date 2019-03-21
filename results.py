@@ -24,9 +24,6 @@ def main():
     k8s = Kubernetes()
     metrics_storage = InfluxDB(args)
     
-    pod = k8s.create_pagerank_pod('pagerank-api-test2', 'vully-1')
-    k8s.deploy_pod(pod)
-    
     finished_pods = k8s.list_finished_pods()
     for pod in finished_pods:
         started = int(k8s.get_started_at(pod))*1000000000

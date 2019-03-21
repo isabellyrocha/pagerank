@@ -73,3 +73,6 @@ class Kubernetes:
 
     def get_host_node(self, pod):
         return pod.spec.node_name
+        
+    def is_finished(self, pod):
+        return pod.status.phase == "Succeeded"
