@@ -7,7 +7,7 @@ class Kubernetes:
         config.load_kube_config()
         self.api_k8s = client.CoreV1Api()
 
-    def create_pagerank_pod(self, host_name, pod_name='pagerank', number_of_nodes=1, node_id=0):
+    def create_pagerank_pod(self, pod_name, host_name=, number_of_nodes=1, node_id=0):
         return V1Pod(
             api_version = 'v1',
             kind = 'Pod',
