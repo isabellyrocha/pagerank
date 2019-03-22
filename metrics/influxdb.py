@@ -67,3 +67,16 @@ class InfluxDB:
             power_values.append(result[index]['value'])
 
         return power_values
+
+    def get_cpu(self, node_name, begin, end):
+        query = 'SELECT value ' \
+                'FROM k8s."default"."custom_cpu/node_utilization" ' \
+                'WHERE "nodename" = \'%s\' and ' \
+                'time >= %d and time <= %d ' % (node_name, begin, end)
+        #print(query)
+        result = list(self.influx_client.query(query))[0]
+        power_values = []
+        for index in range(len(result)):
+            power_values.append(result[index]['value'])
+
+        return power_values

@@ -30,10 +30,13 @@ def main():
         finished = int(k8s.get_finished_at(pod))*1000000000
         host = k8s.get_host_node(pod)
         pod_name = k8s.get_name(pod)
+        #cpu_values = metrics_storage.get_cpu(host, started, finished)
+        #pod_cpu = np.mean(cpu_values)
+        pod_cpu = 26
         power_values = metrics_storage.get_power(host, started, finished)
         pod_energy = energy(power_values)
         pod_duration = (finished - started)/1000000000
-        print(pod_name + "," + str(pod_energy) + "," + str(pod_duration))
+        print(pod_name + "," + str(pod_cpu) + "," + str(pod_energy) + "," + str(pod_duration))
 
 if __name__ == '__main__':
     main()

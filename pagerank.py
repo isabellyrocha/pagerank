@@ -1,8 +1,8 @@
 from __future__ import division
 from argparse import ArgumentParser
 from page import Page
-from metrics.Dummy import InfluxTest
-from metrics.InfluxDB import InfluxDB
+from metrics.dummy import InfluxTest
+from metrics.influxdb import InfluxDB
 import traceback
 
 class PageRank:

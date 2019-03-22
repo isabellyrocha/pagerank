@@ -24,7 +24,7 @@ class Kubernetes:
                             'python3',
                             '/pagerank/pagerank.py',
                             '--pages-file-name=/pagerank/input/web-Stanford-Subet.txt',
-                            '--iterations=3',
+                            '--iterations=10',
                             '--number-of-nodes=%d' % (number_of_nodes),
                             '--node-id=%d' % (node_id),
                             '--influx-host=10.96.21.32',
