@@ -19,7 +19,7 @@ class PageRank:
     def load_graph(self, pages_file_name):
         with open(pages_file_name) as pages_file:
             for line in pages_file:
-                if (not line.startswith('#')):
+                if ((not line.startswith('#')) and (len(self.pages) < 100000)):
                     line_array = line.split('\t')
                     
                     fromNodeId = int(line_array[0])
