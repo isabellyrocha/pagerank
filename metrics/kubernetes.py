@@ -23,7 +23,7 @@ class Kubernetes:
                         command = [
                             'python3',
                             '/pagerank/pagerank.py',
-                            '--pages-file-name=/pagerank/input/web-Stanford-Subet.txt',
+                            '--pages-file-name=/pagerank/input/web-Google.txt',
                             '--iterations=10',
                             '--number-of-nodes=%d' % (number_of_nodes),
                             '--node-id=%d' % (node_id),

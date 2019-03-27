@@ -68,6 +68,23 @@ class InfluxDB:
 
         return power_values
 
+    def get_grouped_power(self, node_name, begin, end):
+        query = 'SELECT mean(value) ' \
+                'FROM k8s."default"."power/node_utilization" ' \
+                'WHERE "nodename" = \'%s\' and ' \
+                'time >= %d and time <= %d ' \
+                'group by time(60s) fill(previous)' % (node_name, begin, end)
+        #print(query)
+        result = list(self.influx_client.query(query))[0]
+        power_values = []
+        for index in range(len(result)):
+            mean = result[index]['mean']
+            if mean == None:
+                mean = 0
+            power_values.append(result[index]['mean'])
+
+        return power_values
+
     def get_cpu(self, node_name, begin, end):
         query = 'SELECT value ' \
                 'FROM k8s."default"."custom_cpu/node_utilization" ' \
@@ -75,8 +92,26 @@ class InfluxDB:
                 'time >= %d and time <= %d ' % (node_name, begin, end)
         #print(query)
         result = list(self.influx_client.query(query))[0]
+        #print(result)
         power_values = []
         for index in range(len(result)):
             power_values.append(result[index]['value'])
 
+        return power_values
+
+    def get_grouped_cpu(self, node_name, begin, end):
+        query = 'SELECT mean(value) ' \
+                'FROM k8s."default"."custom_cpu/node_utilization" ' \
+                'WHERE "nodename" = \'%s\' and ' \
+                'time >= %d and time <= %d ' \
+                'group by time(60s) fill(previous)' % (node_name, begin, end)
+        #print(query)
+        result = list(self.influx_client.query(query))[0]
+        #print(result)
+        power_values = []
+        for index in range(len(result)):
+            mean = result[index]['mean']
+            if mean == None:
+                mean = 0
+            power_values.append(mean)
         return power_values
