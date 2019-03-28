@@ -35,20 +35,25 @@ def main():
         while (not k8s.is_finished(pod)):
             time.sleep(30)
             pod = k8s.get_pod(pod_name)
-    '''        
+        metrics_storage.drop_database()
+    '''
     for pod_id in range(number_of_pods):
         #metrics_storage.drop_database()        
-        pod_name_1 = 'pagerank-dist-%d-1' % (pod_id)
-        pod_name_2 = 'pagerank-dist-%d-2' % (pod_id)
-        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name_1, 'vully-1', 2, 0))
-        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name_2, 'vully-2', 2, 1))
+        pod_name_1 = 'pagerank-dist3-%d-0' % (pod_id)
+        pod_name_2 = 'pagerank-dist3-%d-1' % (pod_id)
+        pod_name_3 = 'pagerank-dist3-%d-2' % (pod_id)
+        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name_1, 'vully-1', 3, 0))
+        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name_2, 'vully-2', 3, 1))
+        k8s.deploy_pod(k8s.create_pagerank_pod(pod_name_3, 'vully-3', 3, 2))
         time.sleep(30)
         pod_1 = k8s.get_pod(pod_name_1)
         pod_2 = k8s.get_pod(pod_name_2)
-        while (not (k8s.is_finished(pod_1) and k8s.is_finished(pod_2))):
+        pod_3 = k8s.get_pod(pod_name_3)
+        while (not (k8s.is_finished(pod_1) and k8s.is_finished(pod_2) and k8s.is_finished(pod_3))):
             time.sleep(30)
             pod_1 = k8s.get_pod(pod_name_1)
-            pod_2 = k8s.get_pod(pod_name_1)
+            pod_2 = k8s.get_pod(pod_name_2)
+            pod_3 = k8s.get_pod(pod_name_3)
         metrics_storage.drop_database()
 
 if __name__ == '__main__':
