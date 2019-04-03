@@ -29,11 +29,11 @@ def main():
     output_dist_3n_2 = open('output_dist_3n_2','w')
     
     finished_pods = k8s.list_finished_pods()
-    grouped_cpu_results = {'dist': {}, 'dist3': {}, 'seq': []}
-    grouped_power_results = {'dist': {}, 'dist3': {}, 'seq': []}
-    grouped_duration_results = {'dist': {}, 'dist3': {}, 'seq': []}
-    power_results_by_min = {'dist': {}, 'dist3': {}, 'seq': []}
-    cpu_results_by_min  = {'dist': {}, 'dist3': {}, 'seq': []}
+    grouped_cpu_results = {'dist2n': {}, 'dist3n': {}, 'seq': []}
+    grouped_power_results = {'dist2n': {}, 'dist3n': {}, 'seq': []}
+    grouped_duration_results = {'dist2n': {}, 'dist3n': {}, 'seq': []}
+    power_results_by_min = {'dist2n': {}, 'dist3n': {}, 'seq': []}
+    cpu_results_by_min  = {'dist2n': {}, 'dist3n': {}, 'seq': []}
     for pod in finished_pods:
         started = int(k8s.get_started_at(pod))*1000000000
         finished = int(k8s.get_finished_at(pod))*1000000000
@@ -45,7 +45,7 @@ def main():
         power_by_min = metrics_storage.get_grouped_power(host, started, finished)
         pod_duration = (finished - started)/1000000000
         pod_type = pod_name.split("-")[1]
-        if pod_type == 'dist' or pod_type == 'dist3':
+        if pod_type == 'dist2n' or pod_type == 'dist3n':
             pod_id = pod_name.split("-")[3]
             if pod_id not in grouped_cpu_results[pod_type].keys():
                 grouped_cpu_results[pod_type][pod_id] = []
@@ -87,34 +87,36 @@ def main():
     duration_seq = duration_seq/len(grouped_duration_results['seq'])
     
     cpu_dist = {'0': 0, '1': 0}
-    for dist_id in grouped_cpu_results['dist'].keys():
-        for cpu_values in grouped_cpu_results['dist'][dist_id]:
-            cpu_dist[dist_id] += np.mean(cpu_values)
-        cpu_dist[dist_id] = cpu_dist[dist_id]/len(grouped_cpu_results['dist'][dist_id])
+    for dist_id in grouped_cpu_results['dist2n'].keys():
+        for cpu_values in grouped_cpu_results['dist2n'][dist_id]:
+            if cpu_values != None:
+                cpu_dist[dist_id] += np.mean(cpu_values)
+        if (dist_id in grouped_cpu_results['dist2n'].keys()) > 0:
+            cpu_dist[dist_id] = cpu_dist[dist_id]/len(grouped_cpu_results['dist2n'][dist_id])
 
     energy_dist = {'0': 0, '1': 0}
-    for dist_id in grouped_power_results['dist'].keys():
-        for energy_values in grouped_power_results['dist'][dist_id]:
+    for dist_id in grouped_power_results['dist2n'].keys():
+        for energy_values in grouped_power_results['dist2n'][dist_id]:
             energy_dist[dist_id] += np.trapz(energy_values)
-        energy_dist[dist_id] = energy_dist[dist_id]/len(grouped_power_results['dist'][dist_id])
+        energy_dist[dist_id] = energy_dist[dist_id]/len(grouped_power_results['dist2n'][dist_id])
 
     energy_dist3 = {'0': 0, '1': 0, '2':0}
-    for dist_id in grouped_power_results['dist3'].keys():
-        for energy_values in grouped_power_results['dist3'][dist_id]:
+    for dist_id in grouped_power_results['dist3n'].keys():
+        for energy_values in grouped_power_results['dist3n'][dist_id]:
             energy_dist3[dist_id] += np.trapz(energy_values)
-        energy_dist3[dist_id] = energy_dist3[dist_id]/len(grouped_power_results['dist3'][dist_id])
+        energy_dist3[dist_id] = energy_dist3[dist_id]/len(grouped_power_results['dist3n'][dist_id])
 
     duration_dist = {'0': 0, '1': 0}
-    for dist_id in grouped_duration_results['dist'].keys():
-        for duration in grouped_duration_results['dist'][dist_id]:
+    for dist_id in grouped_duration_results['dist2n'].keys():
+        for duration in grouped_duration_results['dist2n'][dist_id]:
             duration_dist[dist_id] += duration
-        duration_dist[dist_id] = duration_dist[dist_id]/len(grouped_duration_results['dist'][dist_id])
+        duration_dist[dist_id] = duration_dist[dist_id]/len(grouped_duration_results['dist2n'][dist_id])
     
     duration_dist3 = {'0': 0, '1': 0, '2': 0}
-    for dist_id in grouped_duration_results['dist3'].keys():
-        for duration in grouped_duration_results['dist3'][dist_id]:
+    for dist_id in grouped_duration_results['dist3n'].keys():
+        for duration in grouped_duration_results['dist3n'][dist_id]:
             duration_dist3[dist_id] += duration
-        duration_dist3[dist_id] = duration_dist3[dist_id]/len(grouped_duration_results['dist3'][dist_id])
+        duration_dist3[dist_id] = duration_dist3[dist_id]/len(grouped_duration_results['dist3n'][dist_id])
 
     output_mean.write("1 "+str(energy_seq)+" "+str(duration_seq)+"\n")
     #print(np.sum(energy_dist.values()))
@@ -123,16 +125,16 @@ def main():
     
     power_by_min_seq = power_results_by_min['seq'][0]
     cpu_by_min_seq = cpu_results_by_min['seq'][0]
-    power_by_min_dist_0 = power_results_by_min['dist']['0'][0]
-    power_by_min_dist_1 = power_results_by_min['dist']['1'][0]
-    cpu_by_min_dist_0 = cpu_results_by_min['dist']['0'][0]
-    cpu_by_min_dist_1 = cpu_results_by_min['dist']['1'][0]
-    cpu_by_min_dist3_0 = cpu_results_by_min['dist3']['0'][0]
-    cpu_by_min_dist3_1 = cpu_results_by_min['dist3']['1'][0]
-    cpu_by_min_dist3_2 = cpu_results_by_min['dist3']['2'][0]
-    power_by_min_dist3_0 = power_results_by_min['dist3']['0'][1]
-    power_by_min_dist3_1 = power_results_by_min['dist3']['1'][1]
-    power_by_min_dist3_2 = power_results_by_min['dist3']['2'][1]
+    power_by_min_dist_0 = power_results_by_min['dist2n']['0'][0]
+    power_by_min_dist_1 = power_results_by_min['dist2n']['1'][0]
+    cpu_by_min_dist_0 = cpu_results_by_min['dist2n']['0'][0]
+    cpu_by_min_dist_1 = cpu_results_by_min['dist2n']['1'][0]
+    cpu_by_min_dist3_0 = cpu_results_by_min['dist3n']['0'][0]
+    cpu_by_min_dist3_1 = cpu_results_by_min['dist3n']['1'][0]
+    cpu_by_min_dist3_2 = cpu_results_by_min['dist3n']['2'][0]
+    power_by_min_dist3_0 = power_results_by_min['dist3n']['0'][1]
+    power_by_min_dist3_1 = power_results_by_min['dist3n']['1'][1]
+    power_by_min_dist3_2 = power_results_by_min['dist3n']['2'][1]
 
 
     for i in range(len(power_by_min_seq)):

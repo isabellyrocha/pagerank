@@ -7,6 +7,34 @@ class Kubernetes:
         config.load_kube_config()
         self.api_k8s = client.CoreV1Api()
 
+    def create_pyaes_pod(self, pod_name, host_name, number_of_nodes=1):
+        iterations = int(243/number_of_nodes)
+        return V1Pod(
+            api_version = 'v1',
+            kind = 'Pod',
+            metadata = V1ObjectMeta(
+                name = pod_name
+            ),
+            spec = V1PodSpec(
+                containers = [
+                    V1Container(
+                        name = pod_name,
+                        image_pull_policy = "IfNotPresent",
+                        image = "isabellyrocha/pyaes:raspberry-pi",
+                        command = [
+                            'python',
+                            '/pyaes/crypto_pyaes.py',
+                            '--iterations=%d' % (iterations)
+                        ]
+                    )
+                ],
+                node_selector = {
+                    'kubernetes.io/hostname': host_name
+                },
+                restart_policy = 'OnFailure'
+            )
+        )
+    
     def create_pagerank_pod(self, pod_name, host_name, number_of_nodes=1, node_id=0):
         return V1Pod(
             api_version = 'v1',

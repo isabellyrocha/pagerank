@@ -91,6 +91,8 @@ class InfluxDB:
                 'WHERE "nodename" = \'%s\' and ' \
                 'time >= %d and time <= %d ' % (node_name, begin, end)
         #print(query)
+        if len(list(self.influx_client.query(query))) == 0:
+            return None
         result = list(self.influx_client.query(query))[0]
         #print(result)
         power_values = []
@@ -106,6 +108,8 @@ class InfluxDB:
                 'time >= %d and time <= %d ' \
                 'group by time(60s) fill(previous)' % (node_name, begin, end)
         #print(query)
+        if len(list(self.influx_client.query(query))) == 0:
+            return None
         result = list(self.influx_client.query(query))[0]
         #print(result)
         power_values = []
