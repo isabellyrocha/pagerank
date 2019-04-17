@@ -7,6 +7,61 @@ class Kubernetes:
         config.load_kube_config()
         self.api_k8s = client.CoreV1Api()
 
+    def create_vp_worker_pod(self, pod_name, host_name, duration, time_gap):
+        return V1Pod(
+            api_version = 'v1',
+            kind = 'Pod',
+            metadata = V1ObjectMeta(
+                name = pod_name
+            ),
+            spec = V1PodSpec(
+                containers = [
+                    V1Container(
+                        name = pod_name,
+                        image_pull_policy = "IfNotPresent",
+                        image = "isabellyrocha/video-processing:raspberry-pi",
+                        command = [
+                            'python3',
+                            'input_worker.py',
+                            '--duration=%d',
+                            '--time-gap=%d' % (duration, iterations)
+                        ]
+                    )
+                ],
+                node_selector = {
+                    'kubernetes.io/hostname': host_name
+                },
+                restart_policy = 'OnFailure'
+            )
+        )
+    
+    def create_vp_worker_pod(self, pod_name, host_name, duration):
+        return V1Pod(
+            api_version = 'v1',
+            kind = 'Pod',
+            metadata = V1ObjectMeta(
+                name = pod_name
+            ),
+            spec = V1PodSpec(
+                containers = [
+                    V1Container(
+                        name = pod_name,
+                        image_pull_policy = "IfNotPresent",
+                        image = "isabellyrocha/video-processing:raspberry-pi",
+                        command = [
+                            'python3',
+                            'worker.py',
+                            '--duration=%d' % (iterations)
+                        ]
+                    )
+                ],
+                node_selector = {
+                    'kubernetes.io/hostname': host_name
+                },
+                restart_policy = 'OnFailure'
+            )
+        )
+    
     def create_pyaes_pod(self, pod_name, host_name, number_of_nodes=1):
         iterations = int(243/number_of_nodes)
         return V1Pod(
